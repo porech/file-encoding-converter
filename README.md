@@ -18,8 +18,8 @@ Optional parameters:
 - `-watch`: instead of exiting immediately after conversion, watch for the input file and convert it everytime it changes
 
 ## Build
-If you want to build the project manually, clone the project and run `go build .` in the `src` folder. An executable named `src` (`src.exe` on Windows) will be created.
-
+If you want to build the project manually, be sure to have Golang installed.
+Then, clone the project and run `make` to build for all the supported architectures in the `dist` folder.
 
 ## Supported encodings
 |                   Description |                           Accepted names |
