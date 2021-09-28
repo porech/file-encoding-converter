@@ -4,8 +4,8 @@ A simple utility with one simple purpose: convert a file from one charset encodi
 
 It can be a one-time conversion, or it can watch an input file and convert it to a new encoding in another file everytime it changes.
 
-## Build
-Clone the project and run `go build .` in the `src` folder. An executable named `src` (`src.exe` on Windows) will be created.
+## Download
+We don't have versioning and well-done releases yet. However, you can find pre-build binaries for various architectures in the `dist` folder of this repository. If you need another architecture, just open an issue and I'll add it.
 
 ## Usage
 Required parameters:
@@ -16,6 +16,10 @@ Required parameters:
 
 Optional parameters:
 - `-watch`: instead of exiting immediately after conversion, watch for the input file and convert it everytime it changes
+
+## Build
+If you want to build the project manually, clone the project and run `go build .` in the `src` folder. An executable named `src` (`src.exe` on Windows) will be created.
+
 
 ## Supported encodings
 |                   Description |                           Accepted names |
