@@ -5,7 +5,7 @@ A simple utility with one simple purpose: convert a file from one charset encodi
 It can be a one-time conversion, or it can watch an input file and convert it to a new encoding in another file everytime it changes.
 
 ## Download
-We don't have versioning and well-done releases yet. However, you can find pre-build binaries for various architectures in the `dist` folder of this repository. If you need another architecture, just open an issue and I'll add it.
+We don't have versioning and well-done releases yet. However, you can find pre-build binaries for various architectures in the `dist` folder of this repository. If you need another architecture, just open an issue and we'll add it.
 
 ## Usage
 Required parameters:
