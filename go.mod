@@ -4,5 +4,6 @@ go 1.16
 
 require (
 	github.com/fsnotify/fsnotify v1.5.1
+	github.com/rgeoghegan/tabulate v0.0.0-20170527210506-f65c88667bb4 // indirect
 	golang.org/x/text v0.3.7
 )

@@ -4,36 +4,58 @@ import (
 	"flag"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
-	"golang.org/x/text/encoding"
-	"golang.org/x/text/encoding/charmap"
+	"github.com/rgeoghegan/tabulate"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
-func getDecoder(enc string) *encoding.Decoder {
-	return charmap.Windows1252.NewDecoder()
-}
+var inputEncDec EncoderDecoder
+var outputEncDec EncoderDecoder
 
-func getEncoder(encoding string) *encoding.Encoder {
-	return charmap.Windows1252.NewEncoder()
-}
-
-func convertFile(inputFile, inputEncoding, outputFile, outputEncoding string) error {
+func convertFile(inputFile, outputFile string) error {
 	content, err := ioutil.ReadFile(inputFile)
 	if err != nil {
 		return fmt.Errorf("cannot read file: %w", err)
 	}
-	contentStr := string(content)
-	encoder := getEncoder(outputEncoding)
-	encodedStr, err := encoder.String(contentStr)
+	contentStr, err := inputEncDec.Decode(content)
+	if err != nil {
+		return fmt.Errorf("cannot decode input: %v", err)
+	}
+	encodedBytes, err := outputEncDec.Encode(contentStr)
 	if err != nil {
 		return fmt.Errorf("cannot encode string: %w", err)
 	}
-	err = ioutil.WriteFile(outputFile, []byte(encodedStr), os.ModePerm)
+	err = ioutil.WriteFile(outputFile, encodedBytes, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("cannot write to output file: %w", err)
 	}
 	return nil
+}
+
+func printSupportedEncodings() {
+	encoders := make([][]string, len(availableEncodersDecoders))
+	for i, encoder := range availableEncodersDecoders {
+		names := strings.Join(encoder.Names, ", ")
+		encoders[i] = []string{encoder.Description, names}
+	}
+
+	table, _ := tabulate.Tabulate(encoders, &tabulate.Layout{
+		Format:      tabulate.FancyGridFormat,
+		HideHeaders: false,
+		Headers:     []string{"Description", "Accepted names"},
+	})
+
+	fmt.Println(table)
+}
+
+func printHelp() {
+	fmt.Printf("Convert files from one encoding to another, optionally watching the input file to convert it on any change.\r\n\r\n")
+	fmt.Println("Usage:")
+	flag.PrintDefaults()
+	fmt.Printf("\r\n")
+	fmt.Println("Supported encodings:")
+	printSupportedEncodings()
 }
 
 func main() {
@@ -41,15 +63,40 @@ func main() {
 	var inputEncoding string
 	var outputFile string
 	var outputEncoding string
-	flag.StringVar(&inputFile, "inputFile", "", "The file to watch")
-	flag.StringVar(&inputEncoding, "inputEncoding", "", "The input file encoding")
+	var watch bool
+	flag.StringVar(&inputFile, "inputFile", "", "The input file to read from")
+	flag.StringVar(&inputEncoding, "inputEncoding", "", "The current input file encoding")
 	flag.StringVar(&outputFile, "outputFile", "", "The file to write the converted string to")
-	flag.StringVar(&outputEncoding, "outputEncoding", "", "The output file encoding")
+	flag.StringVar(&outputEncoding, "outputEncoding", "", "The wanted output file encoding")
+	flag.BoolVar(&watch, "watch", false, "Keep the process running and watch the input file for changes")
 	flag.Parse()
+
 	if inputFile == "" || inputEncoding == "" || outputFile == "" || outputEncoding == "" {
-		fmt.Println("Usage:")
-		flag.PrintDefaults()
+		printHelp()
 		os.Exit(1)
+	}
+
+	inputEncDec = getEncoderDecoder(inputEncoding)
+	if inputEncDec == nil {
+		fmt.Printf("Invalid input encoding: %s\r\n", inputEncoding)
+		printHelp()
+		os.Exit(1)
+	}
+
+	outputEncDec = getEncoderDecoder(outputEncoding)
+	if outputEncDec == nil {
+		fmt.Printf("Invalid output encoding: %s\r\n", outputEncoding)
+		printHelp()
+		os.Exit(1)
+	}
+
+	err := convertFile(inputFile, outputFile)
+	if err != nil {
+		fmt.Printf("Error converting file: %v\r\n", err)
+	}
+
+	if !watch {
+		return
 	}
 
 	watcher, err := fsnotify.NewWatcher()
@@ -59,16 +106,14 @@ func main() {
 	}
 	defer watcher.Close()
 
-	//
 	done := make(chan bool)
 
-	//
 	go func() {
 		for {
 			select {
 			// watch for events
 			case <-watcher.Events:
-				err := convertFile(inputFile, inputEncoding, outputFile, outputEncoding)
+				err := convertFile(inputFile, outputFile)
 				if err != nil {
 					fmt.Printf("Error converting file: %v\r\n", err)
 				}
