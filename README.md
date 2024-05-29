@@ -52,7 +52,7 @@ Then, clone the project and run `make` to build for all the supported architectu
 | IBM Code Page 865 |                       codepage865, cp865 |
 | IBM Code Page 866 |                       codepage866, cp866 |
 | IBM Code Page 1047 |                     codepage1047, cp1047 |
-| IBM Code Page 1140 |                     codepage1140, cp1047 |
+| IBM Code Page 1140 |                     codepage1140, cp1140 |
 | ISO 8859-1 |          iso-8859-1, iso-latin-1, latin1 |
 | ISO 8859-2 |          iso-8859-2, iso-latin-2, latin2 |
 | ISO 8859-3 |          iso-8859-3, iso-latin-3, latin3 |
