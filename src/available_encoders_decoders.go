@@ -155,7 +155,7 @@ var availableEncodersDecoders = []availableEncoder{
 		Generator:   func() EncoderDecoder { return NewCharmapEncoderDecoder(charmap.CodePage1047) },
 	},
 	{
-		Names:       []string{"codepage1140", "cp1047"},
+		Names:       []string{"codepage1140", "cp1140"},
 		Description: "IBM Code Page 1140",
 		Generator:   func() EncoderDecoder { return NewCharmapEncoderDecoder(charmap.CodePage1140) },
 	},
